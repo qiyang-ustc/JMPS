@@ -3,6 +3,7 @@ module JMPS
     using LinearAlgebra,TensorOperations,OMEinsum
 
     include("./SciNum.jl")
+    using .SciNumModule
     include("./JMPS_BASIC.jl") # it contains basic functionality of MPS.
     include("./JMPS_PHY.jl")
 end

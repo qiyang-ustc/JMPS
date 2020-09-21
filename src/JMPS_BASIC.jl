@@ -58,7 +58,7 @@ end
 function overlap(mps1::MPS,mps2::MPS)
     epsilon = 1E-13
     E = transpose(reshape(mps1[1],(mps1.S, mps1.bdim[1]))) * reshape(mps2[1],(mps2.S, mps2.bdim[1]))
-    logscale = 0.0
+    scale = SciNum(1.0)
     for i=2:mps1.L
         #E = torch.einsum('ab,ade,bdf->ef', (E, mps1[i], mps2[i])) # einsum version of following three lines
         a=size(mps1[i])[1]
@@ -71,15 +71,15 @@ function overlap(mps1::MPS,mps2::MPS)
         # print('E(end)=',E)
         #normalize E
         s = norm(E)
-        if abs(s) < epsilon
-            return SciNum(0.0,epsilon)
+        if abs(s)< epsilon
+            return SciNum(s)
         end
-        logscale = logscale + log(s)
+        scale = scale*SciNum(s)
         E = E./s # devided by norm
     end
     temp = sum(E)
     @assert abs(imag(temp))<1E-10 # we do not calculate non-real overlap
-    return SciNum(real(temp), logscale)
+    return SciNum(real(temp))*scale
 end
 
 function multiply(mpo::MPO,mps::MPS)
@@ -108,7 +108,7 @@ end
 
 function compress!(mps::MPS,Dcut::Int,epsilon=1E-13)
     # cut a mps up to given bond dimension
-    res = 0.0
+    res = SciNum(1.0)
     #from left to right, svd 
     for site =1:mps.L-1
         l=mps.bdim[site-1] # left bond dimension
@@ -116,7 +116,8 @@ function compress!(mps::MPS,Dcut::Int,epsilon=1E-13)
         A=reshape(mps[site],(l*mps.S,r)) # A is a matrix unfolded from the current tensor
         U,R = qr!(A) # here we intent to do QR = A. However there is no BP, so we do SVD instead 
         s = norm(R)
-        res = res + log(s)
+        # @show s
+        res = res*SciNum(s)
         R = R./s # devided by norm
 
         U = Array(U) # convert strange type into array
