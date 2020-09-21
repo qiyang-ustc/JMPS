@@ -1,6 +1,3 @@
-using Test
-include("../src/SciNum.jl")
-using .SciNumModule
 a = SciNum(1.0,1.0)
 b = SciNum(1.0,-1.0)
 @testset "SciNum.jl" begin

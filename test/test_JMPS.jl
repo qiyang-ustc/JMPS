@@ -19,7 +19,6 @@ ovlp_old = overlap(mps_old, mps_old)
 ovlp = overlap(mps, mps)
 
 a = SciNum(1.0,1.0)
-@show logscale(a)
 @test (logscale(res*res*ovlp) - logscale(ovlp_old)) ≈ 0.0 atol = 1E-10  #check of multiply and compress
 print("Test of overlap and compress PASS\n")
 
