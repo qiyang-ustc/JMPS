@@ -10,6 +10,7 @@ Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 TensorOperations = "6aa20fa7-93e2-5fca-9bc0-fbd0db3c71a2"
 
 [compat]
+OMEinsum = "0.3"
 julia = "1"
 
 [extras]
