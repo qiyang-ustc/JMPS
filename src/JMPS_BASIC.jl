@@ -55,6 +55,10 @@ function transpose!(mpo::MPO)
     return mpo
 end
 
+"""
+overlap of two mps: mps1 and mps2.
+the same as transpose(mps2)*mps1
+"""
 function overlap(mps1::MPS,mps2::MPS)
     epsilon = 1E-13
     E = transpose(reshape(mps1[1],(mps1.S, mps1.bdim[1]))) * reshape(mps2[1],(mps2.S, mps2.bdim[1]))
@@ -88,6 +92,9 @@ function multiply(mpo::MPO,mps::MPS)
     return temp_mps
 end
 
+"""
+for an MPO => T, multiply(mpo,mps)= T|mps>
+"""
 function multiply!(mpo::MPO,mps::MPS)
     for site =1:mps.L
         # @show size(mpo[site]),size(mps[site])

@@ -1,7 +1,7 @@
 using JMPS
 using Test
 
-@testset "JMPS.jl" begin
+@testset "JMPS_BASIC.jl" begin
 mps = MPS(Float64,5,2,4)
 @test sum(mps[1])==0
 @test sum(abs.(mps[5]))==0

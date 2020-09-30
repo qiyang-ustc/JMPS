@@ -6,6 +6,6 @@ module JMPS
     include("./SciNum.jl")
     @reexport using JMPS.SciNumModule
     include("./JMPS_BASIC.jl") # it contains basic functionality of MPS.
-    include("./JMPS_PHY.jl")
+    include("./JMPS_PHY.jl") # entropy
 end
  
