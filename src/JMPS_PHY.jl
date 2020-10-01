@@ -1,4 +1,7 @@
 export entropy
+"""
+This function is not tested!!!
+"""
 function entropy(mps::MPS,bond_id::Int)
     # Calculate the von-Neumann entanglement entropy of an MPS
     #from left to right, svd 
