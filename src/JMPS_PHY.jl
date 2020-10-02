@@ -5,6 +5,7 @@ This function is not tested!!!
 function entropy(mps::MPS,bond_id::Int)
     # Calculate the von-Neumann entanglement entropy of an MPS
     #from left to right, svd 
+    res = 0.0
     @assert bond_id>0 && bond_id <= mps.L
     for site =1:bond_id-1
         l=mps.bdim[site-1] # left bond dimension
