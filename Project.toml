@@ -1,7 +1,7 @@
 name = "JMPS"
 uuid = "c7c79b87-f4d2-437b-a8c7-60158fd3591a"
 authors = ["Qi Yang <qiyang@mail.ustc.edu.cn> and contributors"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
