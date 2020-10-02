@@ -43,5 +43,6 @@ function entropy(mps::MPS,bond_id::Int)
 
     S = S./sqrt(sum(S.*S))  #normalize MPS
     S .+ 1E-100
+    @show S
     return sum(- S.*S .* log.(S.*S))
 end
