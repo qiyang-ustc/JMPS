@@ -99,7 +99,7 @@ multiply!(mpo::MPO,mps::MPS) = multiply!(mpo,mps,1,mps.L)
 
 """
 Multiply only from site s to site e
-Please check s,e \in 1:mps.L
+Please check s,e in 1:mps.L
 """
 function multiply!(mpo::MPO,mps::MPS,s::Int,e::Int) 
     for site = (s>e ? (e:s) : (s:e))
