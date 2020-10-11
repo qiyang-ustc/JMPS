@@ -115,7 +115,7 @@ end
 
 function compress!(mps::MPS,Dcut::Int,epsilon=1E-13)
     # cut a mps up to given bond dimension
-    res = SciNum(1.0)
+    res = 0.0
     #from left to right, svd 
     for site =1:mps.L-1
         l=mps.bdim[site-1] # left bond dimension
@@ -124,7 +124,6 @@ function compress!(mps::MPS,Dcut::Int,epsilon=1E-13)
         U,R = qr!(A) # here we intent to do QR = A. However there is no BP, so we do SVD instead 
         s = norm(R)
         # @show s
-        res = res*SciNum(s)
         R = R./s # devided by norm
 
         U = Array(U) # convert strange type into array
@@ -147,7 +146,7 @@ function compress!(mps::MPS,Dcut::Int,epsilon=1E-13)
         A = reshape(mps[site],(l, r*mps.S))
         U, S, V = svd!(A)
         Dnew = min(Dcut, sum(S.>epsilon))
-        # print (S[:Dnew])
+        res += sum(S[Dnew+1:min(l,r*mps.S)])
         V = @view V[:,1:Dnew]
         V = reshape(adjoint(V),(Dnew,mps.S,:))
         mps[site] = V
