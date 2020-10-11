@@ -95,8 +95,14 @@ end
 """
 for an MPO => T, multiply(mpo,mps)= T|mps>
 """
-function multiply!(mpo::MPO,mps::MPS)
-    for site =1:mps.L
+multiply!(mpo::MPO,mps::MPS) = multiply!(mpo,mps,1,mps.L)
+
+"""
+Multiply only from site s to site e
+Please check s,e \in 1:mps.L
+"""
+function multiply!(mpo::MPO,mps::MPS,s::Int,e::Int) 
+    for site = (s>e ? (e:s) : (s:e))
         # @show size(mpo[site]),size(mps[site])
 	    temp_site = ein"lurd,adb->laurb"(mpo[site], mps[site]) # einsum version of following 4 lines
         # (l,u,r,d)=size(mpo[site])
