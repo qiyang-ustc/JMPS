@@ -1,6 +1,6 @@
 export entropy
 """
-This function is not tested!!!
+return entropy at bond_id
 """
 function entropy(mps::MPS,bond_id::Int)
     # Calculate the von-Neumann entanglement entropy of an MPS
@@ -44,4 +44,57 @@ function entropy(mps::MPS,bond_id::Int)
     S = S./sqrt(sum(S.*S))  #normalize MPS
     S = S .+ 1E-100
     return sum(- S.*S .* log.(S.*S))
+end
+
+"""
+return entropy of every bond
+"""
+function entropy(mps::MPS)
+    function spectrum2entropy(S::Vector)
+        t = S./sqrt(sum(S.*S))  #normalize MPS
+        t = t .+ 1E-100
+        return sum(- t.*t .* log.(t.*t))
+    end
+    # Calculate the von-Neumann entanglement entropy of an MPS
+    #from left to right, svd 
+    v_entropy = zeros(Float64,mps.L-1)
+    for site =1:mps.L-1
+        l=mps.bdim[site-1] # left bond dimension
+        r=mps.bdim[site]   # current bond dimension
+        A=reshape(mps[site],(l*mps.S,r)) # A is a matrix unfolded from the current tensor
+        U,R = qr!(A) # here we intent to do QR = A. However there is no BP, so we do SVD instead 
+        s = norm(R)
+        # @show s
+        R = R./s # devided by norm
+
+        U = Array(U) # convert strange type into array
+        Dnew = size(R)[1]
+        # The following line will cause critical overhead, type of U is strange,
+        # (Never try to slice QRCompactWYQ)
+        # U = @view U[:,1:Dnew] 
+        
+        U = reshape(U ,l,mps.S,Dnew)
+        mps[site] = U   # U is LinearAlgebra.QRCompactWYQ type,it is not normal array
+        R = R*reshape(mps[site+1],r,:)
+        mps[site+1] = reshape(R,:,mps.S,mps.bdim[site+1])
+        mps.bdim[site] = Dnew
+    end
+    #print (mps.bdim)
+    #from right to left, svd
+    for site = mps.L:-1:2 
+        l = mps.bdim[site-1]
+        r = mps.bdim[site]
+        A = reshape(mps[site],(l, r*mps.S))
+        U, S, V = svd!(A)
+        v_entropy[site-1]=spectrum2entropy(S)
+        Dnew = min(Dcut, sum(S.>epsilon))
+        res += sum(S[Dnew+1:min(l,r*mps.S)])
+        V = @view adjoint(V)[1:Dnew,:]
+        V = reshape(V,(Dnew,mps.S,:))
+        mps[site] = V
+        mps[site-1] = reshape(reshape(mps[site-1],mps.bdim[site-2]*mps.S,mps.bdim[site-1])* U[:,1:Dnew] *diagm(S[1:Dnew]),(mps.bdim[site-2], mps.S, Dnew))
+        mps.bdim[site-1] = Dnew
+    end
+    
+    return v_entropy
 end
