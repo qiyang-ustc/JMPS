@@ -1,4 +1,4 @@
-export entropy
+export entropy,spectrum
 """
 return entropy at bond_id
 """
