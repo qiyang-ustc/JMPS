@@ -95,7 +95,7 @@ function entropy(mps::MPS)
     return v_entropy
 end
 
-function entropy(mps::MPS,bond_id::Int)
+function spectrum(mps::MPS,bond_id::Int)
     # Calculate the von-Neumann entanglement entropy of an MPS
     #from left to right, svd 
     res = 0.0
