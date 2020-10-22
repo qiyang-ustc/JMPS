@@ -73,7 +73,7 @@ function entropy(mps::MPS)
         # (Never try to slice QRCompactWYQ)
         # U = @view U[:,1:Dnew] 
         
-        U = reshape(U ,l,mps.S,Dnew)
+        U = reshape(U,l,mps.S,Dnew)
         mps[site] = U   # U is LinearAlgebra.QRCompactWYQ type,it is not normal array
         R = R*reshape(mps[site+1],r,:)
         mps[site+1] = reshape(R,:,mps.S,mps.bdim[site+1])
@@ -87,7 +87,7 @@ function entropy(mps::MPS)
         A = reshape(mps[site],(l, r*mps.S))
         U, S, V = svd!(A)
         v_entropy[site-1]=spectrum2entropy(S)
-        V = reshape(adjoint(V),(l,mps.S,r))
+        V = reshape(adjoint(V),(l,mps.S,:))
         mps[site] = V
         mps[site-1] = reshape(reshape(mps[site-1],mps.bdim[site-2]*mps.S,mps.bdim[site-1])* U *diagm(S),(mps.bdim[site-2], mps.S, :))
     end
@@ -135,4 +135,4 @@ function spectrum(mps::MPS,bond_id::Int)
     U,S,V = svd(l*r)
 
     return S
-end
+end 
