@@ -88,11 +88,10 @@ function entropy(mps::MPS)
         U, S, V = svd!(A)
         Dnew = length(S)
         v_entropy[site-1]=spectrum2entropy(S)
-        V = reshape(adjoint(V),(1:Dnew,mps.S,:))
+        V = reshape(adjoint(V),(Dnew,mps.S,:))
         mps[site] = V
         mps[site-1] = reshape(reshape(mps[site-1],mps.bdim[site-2]*mps.S,mps.bdim[site-1])* U *diagm(S),(mps.bdim[site-2], mps.S, :))
     end
-    
     return v_entropy
 end
 
