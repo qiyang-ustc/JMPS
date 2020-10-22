@@ -47,5 +47,8 @@ result1 = (mps1*mpo)*mps2
 result2 = mps1*(mpo*mps2)
 @test result1-result2 ≈ 0.0 atol = 1E-10
 @test sum(entropy(mps1))>0
+@test sum(entropy(mps2))>0
+compress!(mps2,2)
+@test sum(entropy(mps2))>0
 print("Test of ComplexF64 PASS\n")
 end

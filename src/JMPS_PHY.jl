@@ -49,7 +49,7 @@ end
 """
 return entropy of every bond
 """
-function entropy(mps::MPS)
+function entropy(mps::MPS,epsilon=1E-13)
     function spectrum2entropy(S::Vector)
         t = S./sqrt(sum(S.*S))  #normalize MPS
         t = t .+ 1E-100
@@ -86,13 +86,13 @@ function entropy(mps::MPS)
         r = mps.bdim[site]
         A = reshape(mps[site],(l, r*mps.S))
         U, S, V = svd!(A)
-        mps.bdim[site-1] = Dnewv_entropy[site-1]=spectrum2entropy(S)
-        Dnew = min(Dcut, sum(S.>epsilon))
-        res += sum(S[Dnew+1:min(l,r*mps.S)])
+        v_entropy[site-1]=spectrum2entropy(S)
+        Dnew = min(sum(S.>epsilon))
         V = @view adjoint(V)[1:Dnew,:]
         V = reshape(V,(Dnew,mps.S,:))
         mps[site] = V
         mps[site-1] = reshape(reshape(mps[site-1],mps.bdim[site-2]*mps.S,mps.bdim[site-1])* U[:,1:Dnew] *diagm(S[1:Dnew]),(mps.bdim[site-2], mps.S, Dnew))
+        mps.bdim[site-1] = Dnew
     end
     return v_entropy
 end
