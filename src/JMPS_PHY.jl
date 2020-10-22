@@ -97,9 +97,10 @@ function entropy(mps::MPS,epsilon=1E-13)
     return v_entropy
 end
 
+"""
+Calculate Spectrum in MPS: from site-bond_id to site-bond_id+1
+"""
 function spectrum(mps::MPS,bond_id::Int)
-    # Calculate the von-Neumann entanglement entropy of an MPS
-    #from left to right, svd 
     res = 0.0
     @assert bond_id>0 && bond_id <= mps.L
     for site =1:bond_id-1

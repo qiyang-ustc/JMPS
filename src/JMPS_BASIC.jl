@@ -121,7 +121,7 @@ end
 
 function compress!(mps::MPS,Dcut::Int,epsilon=1E-13)
     # cut a mps up to given bond dimension
-    res = 0.0
+    res = zeros(mps.L-1)
     #from left to right, svd 
     for site =1:mps.L-1
         l=mps.bdim[site-1] # left bond dimension
@@ -152,7 +152,7 @@ function compress!(mps::MPS,Dcut::Int,epsilon=1E-13)
         A = reshape(mps[site],(l, r*mps.S))
         U, S, V = svd!(A)
         Dnew = min(Dcut, sum(S.>epsilon))
-        res += sum(S[Dnew+1:min(l,r*mps.S)])
+        res[site-1] = sum(S[Dnew+1:min(l,r*mps.S)])
         V = @view adjoint(V)[1:Dnew,:]
         V = reshape(V,(Dnew,mps.S,:))
         mps[site] = V
