@@ -1,6 +1,6 @@
 module JMPS
     import Base.getindex,Base.setindex!,Base.*,Base.transpose
-    using LinearAlgebra,TensorOperations,OMEinsum
+    using LinearAlgebra,TensorOperations,OMEinsum,CUDA
 
     using Reexport
     include("./SciNum.jl")

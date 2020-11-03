@@ -23,6 +23,7 @@ module SciNumModule
     import Base.display,Base.promote,Base.Float64,Base.promote_rule,Base.convert
     export promote
 
+    isfinite(a::SciNum) = isfinite(a.s)
     convert(::Type{Float64},n::SciNum) = exp(n.s)*n.mp
     convert(::Type{SciNum},n::Float64) = abs(n)<1E-13 ?  SciNum(-Inf,1.0) : SciNum(log(abs(n)),sign(n))
 

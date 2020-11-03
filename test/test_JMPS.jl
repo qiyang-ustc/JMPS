@@ -9,17 +9,17 @@ mps = MPS(Float64,5,2,4)
 L = 16 
 S = 2
 res = 0.0
-mps = MPS(Float64,L,3,11)
+mps = MPS(Float64,L,3,31)
 for i = 1:1:L
     mps[i] = rand(mps.bdim[i-1],mps.S,mps.bdim[i])
 end
 mps_old = deepcopy(mps)
-res = compress!(mps, 10)
+res = compress!(mps, 30)
 ovlp_old = overlap(mps_old, mps)
 ovlp = overlap(mps, mps_old)
 
 a = SciNum(1.0,1.0)
-@test (ovlp - ovlp_old) ≈ 0.0 atol = 1E-10  #check of multiply and compress
+@test (ovlp - ovlp_old) ≈ 0.0 atol = 1E-5  #check of multiply and compress
 print("Test of overlap and compress PASS\n")
 
 mps2 = MPS(Float64,L,3,15)
