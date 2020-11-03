@@ -1,6 +1,6 @@
-a = SciNum(1.0,1.0)
-b = SciNum(1.0,-1.0)
 @testset "SciNum.jl" begin
+    a = SciNum(1.0,1.0)
+    b = SciNum(1.0,-1.0)
     tol = 1E-13    
 
     @test abs(Float64(a)- exp(1.0))<tol
