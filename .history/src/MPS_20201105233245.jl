@@ -44,8 +44,14 @@ end
     Compress a MPS to bond dimension: Dcut
 """
 function compress!(mps::abstractMPS,Dcut::Int,epsilon=1E-13)
+    check_bdim(mps)#TODO
+    print("1111")
     normalization!(mps,LeftNormalization())
+    check_bdim(mps)#TODO
+    print("1111")
     res = cutoff!(mps,Dcut,LeftNormalization())
+    check_bdim(mps)#TODO
+    print("1111")
     return res
 end
 

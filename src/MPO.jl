@@ -39,12 +39,7 @@ Please check s,e in 1:mps.L
 """
 function multiply!(mpo::MPO,mps::MPS,s::Int,e::Int) 
     for site = (s>e ? (e:s) : (s:e))
-        # @show size(mpo[site]),size(mps[site])
-	    temp_site = ein"lurd,adb->laurb"(mpo[site], mps[site]) # einsum version of following 4 lines
-        # (l,u,r,d)=size(mpo[site])
-        # (a,d,b)=size(mps[site])
-        # temp_site = reshape(mpo[site],:,d)*reshape(permutedims(mps[site],(2,1,3)),d,:) #lurab
-        # temp_site = permutedims(reshape(temp_site,(l,u,r,a,b)),(1,4,2,3,5))
+        temp_site = single_tensor_multiply(mpo[site],mps[site]) # mps[site] = ein"lurd,adb->laurb"(mpo[site], mps[site]) 
         mps.bdim[site-1] = mpo.bdim[site-1]*mps.bdim[site-1] # only change left 
         mps[site] = reshape(temp_site,(mps.bdim[site-1], mps.S,:))
     end

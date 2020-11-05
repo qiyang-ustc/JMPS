@@ -2,7 +2,7 @@ using JMPS
 using Test
 using CUDA
 
-@testset "test_BASIC.jl" begin
+@testset "test_CUDA.jl" begin
 mps = MPS(5,2,4,FloatType=Float64)
 @test sum(mps[1])==0
 @test sum(abs.(mps[5]))==0
