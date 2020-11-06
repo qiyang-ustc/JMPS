@@ -10,7 +10,7 @@ module JMPS
     include("./MPO.jl")
     include("./measure.jl")
     include("./subroutine.jl")
-
+    include("./mvcuda.jl")
     # debug_tools
     include("./utils.jl")
 end
