@@ -1,4 +1,10 @@
 # This file contain lowerest level-1 function
+
+# this is a patch for CUDA.allowscalar(false)
+import Base.convert
+convert(::Type{CuArray{T,2}},U::CUDA.CUSOLVER.CuQRPackedQ{T,CuArray{T,2}}) where T<: Number = CuArray(U)
+convert(::Type{Array{T,2}}, U::LinearAlgebra.QRCompactWYQ{T,Array{T,2}}) where T<: Number = Array(U)
+
 """
     see multiply!
 """
@@ -13,7 +19,7 @@ end
 """
     sweep in a single site
 """
-function single_tensor_sweep!(mps::abstractMPS,site::Int,::LeftNormalization)
+function single_tensor_sweep!(mps::AbstractMPS,site::Int,::LeftNormalization)
     l=mps.bdim[site-1] # left bond dimension
     r=mps.bdim[site]   # current bond dimension
     A=reshape(mps[site],(l*mps.S,r)) # A is a matrix unfolded from the current tensor
@@ -21,7 +27,7 @@ function single_tensor_sweep!(mps::abstractMPS,site::Int,::LeftNormalization)
     s = norm(R)
     R = R./s # devided by norm
     res = log(s)
-    U = copy(typeof(R)(U)) 
+    U = convert(typeof(R),U) 
     Dnew = size(R)[1]
 
     U = reshape(U ,l,mps.S,Dnew)
@@ -32,15 +38,16 @@ function single_tensor_sweep!(mps::abstractMPS,site::Int,::LeftNormalization)
     return res
 end
 
-function single_tensor_sweep!(mps::abstractMPS,site::Int,::RightNormalization)
+function single_tensor_sweep!(mps::AbstractMPS,site::Int,::RightNormalization)
     l = mps.bdim[site-1]
     r = mps.bdim[site]
     A = copy(reshape(mps[site],(l, r*mps.S)))
     A = copy(transpose(A))
     U,R = qr!(A) # UR = A^{T} R^{T}U^{T} = A
     Dnew = size(R)[1]
-    U = copy(transpose(copy(typeof(R)(U))))
-    R = copy(transpose(R))
+    U = convert(typeof(R),U)
+    U = convert(typeof(R),transpose(U))
+    R = convert(typeof(U),transpose(R))
     mps[site] = reshape(U,(Dnew,mps.S,r))
     mps[site-1] = reshape(reshape(mps[site-1],mps.bdim[site-2]*mps.S,mps.bdim[site-1])* R ,(mps.bdim[site-2], mps.S, Dnew))
     mps.bdim[site-1] = Dnew
@@ -49,7 +56,7 @@ end
 """
     cut-off a single tensor
 """
-function single_tensor_cutoff!(mps::abstractMPS,site::Int,Dcut::Int,::LeftNormalization;epsilon=0)
+function single_tensor_cutoff!(mps::AbstractMPS,site::Int,Dcut::Int,::LeftNormalization;epsilon=0)
     l = mps.bdim[site-1]
     r = mps.bdim[site]
     A = reshape(mps[site],(l, r*mps.S))
@@ -59,7 +66,7 @@ function single_tensor_cutoff!(mps::abstractMPS,site::Int,Dcut::Int,::LeftNormal
     V = copy(adjoint(V))[1:Dnew,:]
     V = reshape(V,(Dnew,mps.S,:))
     mps[site] = V
-    mps[site-1] = reshape(reshape(mps[site-1],mps.bdim[site-2]*mps.S,mps.bdim[site-1])* U[:,1:Dnew] *diagm(S[1:Dnew]),(mps.bdim[site-2], mps.S, Dnew))
+    mps[site-1] = reshape(reshape(mps[site-1],mps.bdim[site-2]*mps.S,mps.bdim[site-1])* U[:,1:Dnew] *Diagonal(S[1:Dnew]),(mps.bdim[site-2], mps.S, Dnew))
     mps.bdim[site-1] = Dnew
     return res
 end
@@ -67,7 +74,7 @@ end
 """
     find the sigular value spectrum for a single tensor
 """
-function single_tensor_spectrum!(mps::abstractMPS,site::Int;epsilon=1E-13)
+function single_tensor_spectrum!(mps::AbstractMPS,site::Int;epsilon=1E-13)
     l = mps.bdim[site-1]
     r = mps.bdim[site]
     A = reshape(mps[site],(l, r*mps.S))
@@ -76,7 +83,7 @@ function single_tensor_spectrum!(mps::abstractMPS,site::Int;epsilon=1E-13)
     V = copy(adjoint(V))[1:Dnew,:]
     V = copy(reshape(V,(Dnew,mps.S,:)))
     mps[site] = V
-    mps[site-1] = reshape(reshape(mps[site-1],mps.bdim[site-2]*mps.S,mps.bdim[site-1])* U[:,1:Dnew] *diagm(S[1:Dnew]),(mps.bdim[site-2], mps.S, Dnew))
+    mps[site-1] = reshape(reshape(mps[site-1],mps.bdim[site-2]*mps.S,mps.bdim[site-1])* U[:,1:Dnew] *Diagonal(S[1:Dnew]),(mps.bdim[site-2], mps.S, Dnew))
     mps.bdim[site-1] = Dnew
     return S
 end

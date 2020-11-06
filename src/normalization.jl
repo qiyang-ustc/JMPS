@@ -9,7 +9,7 @@ export normalization!,RightNormalization,LeftNormalization,MixNormalization,Norm
     low level API, should not be exposed to user.
     Sweep from left to right 
 """
-function sweep!(mps::abstractMPS,endpoint::Int,::LeftNormalization)
+function sweep!(mps::AbstractMPS,endpoint::Int,::LeftNormalization)
     res = 0.0
     @assert endpoint<mps.L && endpoint > 1
     for site =1:endpoint
@@ -23,7 +23,7 @@ end
     low level API, should not be exposed to user.
     Sweep from right to left
 """
-function sweep!(mps::abstractMPS,endpoint::Int,::RightNormalization)
+function sweep!(mps::AbstractMPS,endpoint::Int,::RightNormalization)
     res = 0.0
     @assert endpoint<mps.L && endpoint > 1
     for site = mps.L:-1:endpoint
@@ -37,7 +37,7 @@ end
     low level API, should not be exposed to user.
     Sweep from right to endpoint-1 and left to endpoint+1
 """
-function sweep!(mps::abstractMPS,endpoint::Int,::MixNormalization)
+function sweep!(mps::AbstractMPS,endpoint::Int,::MixNormalization)
     res = 0.0
     res += sweep!(mps,endpoint-1,LeftNormalization())
     res += sweep!(mps,endpoint+1,RightNormalization())
@@ -47,7 +47,7 @@ end
 """
     Cut-off subprogram for a Left normalization MPS.
 """
-function cutoff!(mps::abstractMPS,Dcut::Int,::LeftNormalization)
+function cutoff!(mps::AbstractMPS,Dcut::Int,::LeftNormalization)
     res = zeros(mps.L-1)
     for site = mps.L:-1:2 
         res[site-1] = single_tensor_cutoff!(mps,site,Dcut,LeftNormalization())
@@ -59,19 +59,19 @@ end
     normalization for MPS. This function will set the norm of a mps to 1.
         return res = log(s...)
 """
-function normalization!(mps::abstractMPS,::LeftNormalization)
+function normalization!(mps::AbstractMPS,::LeftNormalization)
     res = sweep!(mps,mps.L-1,LeftNormalization())
     mps[mps.L] = mps[mps.L]/sqrt(sum(mps[mps.L].*mps[mps.L]))
     return res
 end
 
-function normalization!(mps::abstractMPS,::RightNormalization)
+function normalization!(mps::AbstractMPS,::RightNormalization)
     res = sweep!(mps,2,RightNormalization())
     mps[1] = mps[1]/sqrt(sum(mps[1].*mps[1]))
     return res
 end
 
-function normalization!(mps::abstractMPS,site::Int,::MixNormalization)
+function normalization!(mps::AbstractMPS,site::Int,::MixNormalization)
     res = sweep!(mps,site,MixNormalization())
     mps[site] = mps[site]/sqrt(sum(mps[site].*mps[site]))
     return res

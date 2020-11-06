@@ -1,5 +1,7 @@
 using JMPS
 using Test
+using CUDA
+CUDA.allowscalar(false)
 
 @testset "JMPS_CUDA.jl" begin
 mps = MPS(5,2,4,FloatType=Float64,ArrayType=CuArray)

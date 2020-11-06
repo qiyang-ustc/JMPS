@@ -2,7 +2,7 @@ export entropy,spectrum
 """
     Calculate the von-Neumann entanglement entropy of an MPS at bond_id
 """
-function entropy(mps::MPS,bond_id::Int)
+function entropy(mps::AbstractMPS,bond_id::Int)
     S = spectrum(mps,bond_id)
     S = S./sqrt(sum(S.*S))  #normalize MPS
     S = S .+ 1E-100
@@ -12,8 +12,8 @@ end
 """
     Calculate von-Neumann entanglement entropy of every bonds
 """
-function entropy(mps::MPS,epsilon=1E-13)
-    function spectrum2entropy(S::Vector)
+function entropy(mps::AbstractMPS,epsilon=1E-13)
+    function spectrum2entropy(S::AbstractVector)
         t = S./sqrt(sum(S.*S))  #normalize MPS
         t = t .+ 1E-100
         return sum(- t.*t .* log.(t.*t))
@@ -34,7 +34,7 @@ end
 """
 Calculate Spectrum in MPS: from site-bond_id to site-bond_id+1
 """
-function spectrum(mps::MPS,bond_id::Int)
+function spectrum(mps::AbstractMPS,bond_id::Int)
     res = 0.0
     @assert bond_id>0 && bond_id <= mps.L
     normalization!(mps,bond_id)

@@ -1,7 +1,7 @@
 """
 MPS is a series of tensors, and also a vector in Hilbert space.
 """
-mutable struct MPS{FloatType<:Number,ArrayType<:AbstractArray{FloatType,3}} <: abstractMPS
+mutable struct MPS{FloatType<:Number,ArrayType<:AbstractArray{FloatType,3}} <: AbstractMPS
     L::Int #length
     S::Int #physical index
     bdim::Bdims #bond dimension
@@ -18,7 +18,7 @@ end
 overlap of two mps: mps1 and mps2.
 the same as transpose(mps2)*mps1
 """
-function overlap(mps1::abstractMPS,mps2::abstractMPS)
+function overlap(mps1::AbstractMPS,mps2::AbstractMPS)
     epsilon = 1E-13
     E = transpose(reshape(mps1[1],(mps1.S, mps1.bdim[1]))) * reshape(mps2[1],(mps2.S, mps2.bdim[1]))
     scale = SciNum(1.0)
@@ -43,7 +43,7 @@ end
 """
     Compress a MPS to bond dimension: Dcut
 """
-function compress!(mps::abstractMPS,Dcut::Int,epsilon=1E-13)
+function compress!(mps::AbstractMPS,Dcut::Int,epsilon=1E-13)
     normalization!(mps,LeftNormalization())
     res = cutoff!(mps,Dcut,LeftNormalization())
     return res
@@ -69,7 +69,7 @@ dag!(mps::MPS{T,V}) where T<: Real where V = mps
     display mps(array...)
     Just think that it display an element for a vector in Hilbert space.
 """
-function disp(mps::abstractMPS,array::Array{Int,1})
+function disp(mps::AbstractMPS,array::Array{Int,1})
     @assert mps.L == size(array)[1]
     t = transpose(mps[1][1,array[1],:])
     for i = 2:mps.L

@@ -4,7 +4,7 @@ export MPS,MPO,getindex,setindex!,overlap,multiply!,multiply,compress!,*,transpo
 
 abstract type TensorNetwork end
 abstract type TensorArray <: TensorNetwork end
-abstract type abstractMPS <: TensorArray end 
+abstract type AbstractMPS <: TensorArray end 
 abstract type abstractMPO <: TensorArray end
 getindex(tensors::TensorArray,target::Int) = getindex(tensors.tensor,target)
 setindex!(tensors::TensorArray,tensor::AbstractArray,target::Int) = setindex!(tensors.tensor,tensor,target)
