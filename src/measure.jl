@@ -37,7 +37,7 @@ Calculate Spectrum in MPS: from site-bond_id to site-bond_id+1
 function spectrum(mps::AbstractMPS,bond_id::Int)
     res = 0.0
     @assert bond_id>0 && bond_id <= mps.L
-    normalization!(mps,bond_id)
+    normalization!(mps,bond_id,MixNormalization())
     U,S,V = svd(reshape(mps[bond_id],mps.bdim[bond_id-1]*mps.S,mps.bdim[bond_id]))
     return S
 end 
