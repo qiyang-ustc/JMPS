@@ -3,7 +3,7 @@
 USE_CUDA = false
 export allowcuda
 function allowcuda(b::Bool)
-    USE_CUDA = b
+    global USE_CUDA = b
 end
 
 import Base.convert
