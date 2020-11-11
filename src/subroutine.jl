@@ -44,7 +44,12 @@ function single_tensor_sweep!(mps::AbstractMPS,site::Int,::LeftNormalization)
 
     U = reshape(U ,l,mps.S,Dnew)
     mps[site] = Array(U)   # U is LinearAlgebra.QRCompactWYQ type,it is not normal array
-    R = R*reshape(mps[site+1],r,:)
+    if USE_CUDA
+        R = R*CuArray(reshape(mps[site+1],r,:))
+    else
+        R = R*reshape(mps[site+1],r,:)
+    end
+    
     mps[site+1] = Array(reshape(R,:,mps.S,mps.bdim[site+1]))
     mps.bdim[site] = Dnew
     return res
@@ -64,7 +69,11 @@ function single_tensor_sweep!(mps::AbstractMPS,site::Int,::RightNormalization)
     U = convert(typeof(R),transpose(U))
     R = convert(typeof(U),transpose(R))
     mps[site] = Array(reshape(U,(Dnew,mps.S,r)))
-    mps[site-1] = Array(reshape(reshape(mps[site-1],mps.bdim[site-2]*mps.S,mps.bdim[site-1])* R ,(mps.bdim[site-2], mps.S, Dnew)))
+    temp = reshape(mps[site-1],mps.bdim[site-2]*mps.S,mps.bdim[site-1])
+    if USE_CUDA
+        temp = CuArray(temp)
+    else
+    mps[site-1] = Array(reshape(temp* R ,(mps.bdim[site-2], mps.S, Dnew)))
     mps.bdim[site-1] = Dnew
 end
 
@@ -84,7 +93,11 @@ function single_tensor_cutoff!(mps::AbstractMPS,site::Int,Dcut::Int,::LeftNormal
     V = copy(adjoint(V))[1:Dnew,:]
     V = reshape(V,(Dnew,mps.S,:))
     mps[site] = Array(V)
-    mps[site-1] = Array(reshape(reshape(mps[site-1],mps.bdim[site-2]*mps.S,mps.bdim[site-1])* U[:,1:Dnew] *Diagonal(S[1:Dnew]),(mps.bdim[site-2], mps.S, Dnew)))
+    temp = reshape(mps[site-1],mps.bdim[site-2]*mps.S,mps.bdim[site-1])
+    if USE_CUDA
+        temp = CuArray(temp)
+    end
+    mps[site-1] = Array(reshape(temp* U[:,1:Dnew] *Diagonal(S[1:Dnew]),(mps.bdim[site-2], mps.S, Dnew)))
     mps.bdim[site-1] = Dnew
     return res
 end
@@ -104,7 +117,11 @@ function single_tensor_spectrum!(mps::AbstractMPS,site::Int;epsilon=1E-13)
     V = copy(adjoint(V))[1:Dnew,:]
     V = copy(reshape(V,(Dnew,mps.S,:)))
     mps[site] = Array(V)
-    mps[site-1] = Array(reshape(reshape(mps[site-1],mps.bdim[site-2]*mps.S,mps.bdim[site-1])* U[:,1:Dnew] *Diagonal(S[1:Dnew]),(mps.bdim[site-2], mps.S, Dnew)))
+    temp = reshape(mps[site-1],mps.bdim[site-2]*mps.S,mps.bdim[site-1])
+    if USE_CUDA
+        temp = CuArray(temp)
+    end
+    mps[site-1] = Array(reshape(temp* U[:,1:Dnew] *Diagonal(S[1:Dnew]),(mps.bdim[site-2], mps.S, Dnew)))
     mps.bdim[site-1] = Dnew
     return S
 end
