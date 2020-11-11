@@ -44,13 +44,11 @@ function single_tensor_sweep!(mps::AbstractMPS,site::Int,::LeftNormalization)
 
     U = reshape(U ,l,mps.S,Dnew)
     mps[site] = Array(U)   # U is LinearAlgebra.QRCompactWYQ type,it is not normal array
+    temp = reshape(mps[site+1],r,:)
     if USE_CUDA
-        R = R*CuArray(reshape(mps[site+1],r,:))
-    else
-        R = R*reshape(mps[site+1],r,:)
+        temp = CuArray(temp)
     end
-    
-    mps[site+1] = Array(reshape(R,:,mps.S,mps.bdim[site+1]))
+    mps[site+1] = Array(reshape(R*temp,:,mps.S,mps.bdim[site+1]))
     mps.bdim[site] = Dnew
     return res
 end
@@ -72,7 +70,7 @@ function single_tensor_sweep!(mps::AbstractMPS,site::Int,::RightNormalization)
     temp = reshape(mps[site-1],mps.bdim[site-2]*mps.S,mps.bdim[site-1])
     if USE_CUDA
         temp = CuArray(temp)
-    else
+    end
     mps[site-1] = Array(reshape(temp* R ,(mps.bdim[site-2], mps.S, Dnew)))
     mps.bdim[site-1] = Dnew
 end
