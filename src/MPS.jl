@@ -43,7 +43,7 @@ end
 """
     Compress a MPS to bond dimension: Dcut
 """
-function compress!(mps::AbstractMPS,Dcut::Int,epsilon=1E-13)
+function compress!(mps::AbstractMPS,Dcut::Int,epsilon=1E-13;use_cuda=false)
     normalization!(mps,LeftNormalization())
     res = cutoff!(mps,Dcut,LeftNormalization())
     return res
