@@ -3,7 +3,6 @@ module JMPS
     using LinearAlgebra,TensorOperations,OMEinsum,CUDA
 
     include("./abstract_types.jl")
-    include("./SciNum.jl")
     include("./Bdim.jl")
     include("./MPS.jl")
     include("./normalization.jl")

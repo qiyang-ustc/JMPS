@@ -26,7 +26,6 @@ normalization!(mps,LeftNormalization())
 normalization!(mps_old,RightNormalization())
 @test overlap(mps,mps_old) ≈ 1.0 atol = 1E-5
 
-a = SciNum(1.0,1.0)
 @test (ovlp - ovlp_old) ≈ 0.0 atol = 1E-5  #check of multiply and compress
 print("Test of overlap and compress PASS\n")
 

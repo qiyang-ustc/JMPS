@@ -3,7 +3,7 @@ using Test
 using CUDA
 
 @testset "test_BASIC.jl" begin
-mps = MPS(5,2,4,FloatType=Float64)
+mps = MPS(5,2,4,FloatType=Float32)
 @test sum(mps[1])==0
 @test sum(abs.(mps[5]))==0
 
@@ -24,7 +24,6 @@ normalization!(mps,LeftNormalization())
 normalization!(mps_old,RightNormalization())
 @test overlap(mps,mps_old) ≈ 1.0 atol = 1E-5
 
-a = SciNum(1.0,1.0)
 @test (ovlp - ovlp_old) ≈ 0.0 atol = 1E-5  #check of multiply and compress
 print("Test of overlap and compress PASS\n")
 
