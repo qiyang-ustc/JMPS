@@ -1,7 +1,10 @@
 # This file contain lowerest level-1 function
 # this is a patch for CUDA.allowscalar(false)
-export USE_CUDA
 USE_CUDA = false
+export allowcuda
+function allowcuda(b::Bool)
+    USE_CUDA = b
+end
 
 import Base.convert
 convert(::Type{CuArray{T,2}},U::CUDA.CUSOLVER.CuQRPackedQ{T,CuArray{T,2}}) where T<: Number = CuArray(U)
