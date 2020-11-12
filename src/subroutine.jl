@@ -100,7 +100,6 @@ function single_tensor_cutoff!(mps::AbstractMPS,site::Int,Dcut::Int,::LeftNormal
     end
     mps[site-1] = Array(reshape(temp* U[:,1:Dnew] *Diagonal(S[1:Dnew]),(mps.bdim[site-2], mps.S, Dnew)))
     mps.bdim[site-1] = Dnew
-    gc()
     return res
 end
 
