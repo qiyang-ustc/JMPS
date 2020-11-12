@@ -36,6 +36,7 @@ function single_tensor_sweep!(mps::AbstractMPS,site::Int,::LeftNormalization)
         A = CuArray(A)
     end
     U,R = qr!(A) # here we intent to do QR = A. However there is no BP, so we do SVD instead 
+    A = nothing # clear cache
     s = norm(R)
     R = R./s # devided by norm
     res = log(s)
@@ -62,6 +63,7 @@ function single_tensor_sweep!(mps::AbstractMPS,site::Int,::RightNormalization)
     end
     A = copy(transpose(A))
     U,R = qr!(A) # UR = A^{T} R^{T}U^{T} = A
+    A = nothing
     Dnew = size(R)[1]
     U = convert(typeof(R),U)
     U = convert(typeof(R),transpose(U))
@@ -86,6 +88,7 @@ function single_tensor_cutoff!(mps::AbstractMPS,site::Int,Dcut::Int,::LeftNormal
         A = CuArray(A)
     end
     U, S, V = svd!(A)
+    A = nothing
     Dnew = min(Dcut, sum(S.>epsilon))
     res = sum(S[Dnew+1:min(l,r*mps.S)])
     V = copy(adjoint(V))[1:Dnew,:]
@@ -97,6 +100,7 @@ function single_tensor_cutoff!(mps::AbstractMPS,site::Int,Dcut::Int,::LeftNormal
     end
     mps[site-1] = Array(reshape(temp* U[:,1:Dnew] *Diagonal(S[1:Dnew]),(mps.bdim[site-2], mps.S, Dnew)))
     mps.bdim[site-1] = Dnew
+    gc()
     return res
 end
 
@@ -111,6 +115,7 @@ function single_tensor_spectrum!(mps::AbstractMPS,site::Int;epsilon=1E-13)
         A = CuArray(A)
     end
     U, S, V = svd!(A)
+    A = nothing
     Dnew = min(sum(S.>epsilon))
     V = copy(adjoint(V))[1:Dnew,:]
     V = copy(reshape(V,(Dnew,mps.S,:)))
