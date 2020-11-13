@@ -18,27 +18,7 @@ end
 overlap of two mps: mps1 and mps2.
 the same as transpose(mps2)*mps1
 """
-function overlap(mps1::AbstractMPS,mps2::AbstractMPS)
-    epsilon = 1E-13
-    E = transpose(reshape(mps1[1],(mps1.S, mps1.bdim[1]))) * reshape(mps2[1],(mps2.S, mps2.bdim[1]))
-    res = 0.0
-    for i=2:mps1.L
-        #E = torch.einsum('ab,ade,bdf->ef', (E, mps1[i], mps2[i])) # einsum version of following three lines
-        a=size(mps1[i])[1]
-        e=size(mps1[i])[3]
-        E = transpose(reshape(transpose(E) * reshape(mps1[i],a,:),:,e))
-        E = E * reshape(mps2[i],:,mps2.bdim[i])
-        s = norm(E)
-        if abs(s)< epsilon
-            return s
-        end
-        res += log(s)
-        E = E./s # devided by norm
-    end
-    temp = sum(E)
-    @assert abs(imag(temp))<1E-10 # TODO: we do not calculate non-real overlap. May need complex support
-    return temp*exp(res)
-end
+overlap(mps1::AbstractMPS,mps2::AbstractMPS;ArraType=CuArray) = _overlap(mps1,mps2,ArraType)
 
 """
     Compress a MPS to bond dimension: Dcut

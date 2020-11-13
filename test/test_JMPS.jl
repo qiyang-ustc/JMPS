@@ -12,8 +12,9 @@ S = 2
 res = 0.0
 mps = MPS(L,3,31,FloatType=Float64)
 for i = 1:1:L
-    mps[i] = rand(mps.bdim[i-1],mps.S,mps.bdim[i])
+    mps[i] = rand(mps.bdim[i-1],mps.S,mps.bdim[i]);
 end
+normalization!(mps,LeftNormalization())
 mps_old = deepcopy(mps)
 res = compress!(mps, 30)
 ovlp_old = overlap(mps_old, mps)
@@ -34,7 +35,6 @@ for i = 1:1:L
     mpo[i] = rand(mpo.bdim[i-1],mpo.S,mpo.bdim[i],mpo.S)
 end
 mps1 = mps
-t = mps1*mpo
 result1 = (mps1*mpo)*mps2
 result2 = mps1*(mpo*mps2)
 @test Float64(result1-result2) ≈ 0.0 atol = 1E-10
