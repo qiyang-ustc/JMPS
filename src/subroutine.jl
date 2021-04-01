@@ -145,7 +145,7 @@ function _overlap(mps1::AbstractMPS,mps2::AbstractMPS,::Type{CuArray})
     end
     temp = sum(E)
     @assert abs(imag(temp))<1E-10 # TODO: we do not calculate non-real overlap. May need complex support
-    return res+log(temp)
+    return real(exp(res)*temp)
 end
 
 function _overlap(mps1::AbstractMPS,mps2::AbstractMPS,::Type{Array})
@@ -164,5 +164,5 @@ function _overlap(mps1::AbstractMPS,mps2::AbstractMPS,::Type{Array})
     end
     temp = sum(E)
     @assert abs(imag(temp))<1E-10 # TODO: we do not calculate non-real overlap. May need complex support
-    return real(res+log(temp))
+    return real(exp(res)*temp)
 end

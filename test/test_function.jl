@@ -99,7 +99,7 @@ end
     @test disp(mps,[1;3])≈-2/3
     @test disp(mps,[3;1])≈0
     @test disp(mps,[2;2])≈1/3
-    @test exp(mps*mps) ≈ 5/9
+    @test mps*mps ≈ 5/9
     x = 1/5
     @test entropy(mps,1) ≈ -(x*log(x)+4x*log(4x)) #will normalize mps
     @test sum(entropy(mps)) ≈ -(x*log(x)+4x*log(4x))
