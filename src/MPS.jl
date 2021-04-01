@@ -17,6 +17,8 @@ end
 """
 overlap of two mps: mps1 and mps2.
 the same as transpose(mps2)*mps1
+
+Automatically using CUDA
 """
 overlap(mps1::AbstractMPS,mps2::AbstractMPS;ArraType=CuArray) = _overlap(mps1,mps2,ArraType)
 
@@ -55,6 +57,5 @@ function disp(mps::AbstractMPS,array::Array{Int,1})
     for i = 2:mps.L
         t = t*mps[i][:,array[i],:]
     end
-    return t
+    return t[1,1]
 end
-

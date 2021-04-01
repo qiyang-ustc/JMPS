@@ -11,7 +11,6 @@ export normalization!,RightNormalization,LeftNormalization,MixNormalization,Norm
 """
 function sweep!(mps::AbstractMPS,endpoint::Int,::LeftNormalization)
     res = 0.0
-    @assert endpoint<mps.L && endpoint > 1
     for site =1:endpoint
         res+=single_tensor_sweep!(mps,site,LeftNormalization())
     end
@@ -25,7 +24,6 @@ end
 """
 function sweep!(mps::AbstractMPS,endpoint::Int,::RightNormalization)
     res = 0.0
-    @assert endpoint<mps.L && endpoint > 1
     for site = mps.L:-1:endpoint
         res+=single_tensor_sweep!(mps,site,RightNormalization())
     end

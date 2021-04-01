@@ -80,7 +80,7 @@ end
 """
     cut-off a single tensor
 """
-function single_tensor_cutoff!(mps::AbstractMPS,site::Int,Dcut::Int,::LeftNormalization;epsilon=0)
+function single_tensor_cutoff!(mps::AbstractMPS,site::Int,Dcut::Int,::LeftNormalization;ϵ=0)
     l = mps.bdim[site-1]
     r = mps.bdim[site]
     A = reshape(mps[site],(l, r*mps.S))
@@ -89,7 +89,7 @@ function single_tensor_cutoff!(mps::AbstractMPS,site::Int,Dcut::Int,::LeftNormal
     end
     U, S, V = svd!(A)
     A = nothing
-    Dnew = min(Dcut, sum(S.>epsilon))
+    Dnew = min(Dcut, sum(S.>ϵ))
     res = sum(S[Dnew+1:min(l,r*mps.S)])
     V = copy(adjoint(V))[1:Dnew,:]
     V = reshape(V,(Dnew,mps.S,:))
@@ -106,7 +106,7 @@ end
 """
     find the sigular value spectrum for a single tensor
 """
-function single_tensor_spectrum!(mps::AbstractMPS,site::Int;epsilon=1E-13)
+function single_tensor_spectrum!(mps::AbstractMPS,site::Int;ϵ=1E-13)
     l = mps.bdim[site-1]
     r = mps.bdim[site]
     A = reshape(mps[site],(l, r*mps.S))
@@ -115,7 +115,7 @@ function single_tensor_spectrum!(mps::AbstractMPS,site::Int;epsilon=1E-13)
     end
     U, S, V = svd!(A)
     A = nothing
-    Dnew = min(sum(S.>epsilon))
+    Dnew = min(sum(S.>ϵ))
     V = copy(adjoint(V))[1:Dnew,:]
     V = copy(reshape(V,(Dnew,mps.S,:)))
     mps[site] = Array(V)
@@ -129,29 +129,27 @@ function single_tensor_spectrum!(mps::AbstractMPS,site::Int;epsilon=1E-13)
 end
 
 function _overlap(mps1::AbstractMPS,mps2::AbstractMPS,::Type{CuArray})
-    epsilon = 1E-13
-    E = cu(transpose(reshape(mps1[1],(mps1.S, mps1.bdim[1])))) * cu(reshape(mps2[1],(mps2.S, mps2.bdim[1])))
+    ϵ = 1E-30
+    FloatType = eltype(mps1[1])
+    E = CuArray{FloatType}(transpose(reshape(mps1[1],(mps1.S, mps1.bdim[1])))) * CuArray{FloatType}(reshape(mps2[1],(mps2.S, mps2.bdim[1])))
     res = 0.0
     for i=2:mps1.L
         #E = torch.einsum('ab,ade,bdf->ef', (E, mps1[i], mps2[i])) # einsum version of following three lines
         a=size(mps1[i])[1]
         e=size(mps1[i])[3]
-        E = transpose(reshape(transpose(E) * reshape(cu(mps1[i]),a,:),:,e))
-        E = E * reshape(cu(mps2[i]),:,mps2.bdim[i])
+        E = transpose(reshape(transpose(E) * reshape(CuArray{FloatType}(mps1[i]),a,:),:,e))
+        E = E * reshape(CuArray{FloatType}(mps2[i]),:,mps2.bdim[i])
         s = norm(E)
-        if abs(s)< epsilon
-            return s
-        end
         res += log(s)
         E = E./s # devided by norm
     end
     temp = sum(E)
     @assert abs(imag(temp))<1E-10 # TODO: we do not calculate non-real overlap. May need complex support
-    return temp*exp(res)
+    return res+log(temp)
 end
 
 function _overlap(mps1::AbstractMPS,mps2::AbstractMPS,::Type{Array})
-    epsilon = 1E-13
+    ϵ = 1E-13
     E = transpose(reshape(mps1[1],(mps1.S, mps1.bdim[1]))) * reshape(mps2[1],(mps2.S, mps2.bdim[1]))
     res = 0.0
     for i=2:mps1.L
@@ -161,13 +159,10 @@ function _overlap(mps1::AbstractMPS,mps2::AbstractMPS,::Type{Array})
         E = transpose(reshape(transpose(E) * reshape(mps1[i],a,:),:,e))
         E = E * reshape(mps2[i],:,mps2.bdim[i])
         s = norm(E)
-        if abs(s)< epsilon
-            return s
-        end
         res += log(s)
         E = E./s # devided by norm
     end
     temp = sum(E)
     @assert abs(imag(temp))<1E-10 # TODO: we do not calculate non-real overlap. May need complex support
-    return temp*exp(res)
+    return real(res+log(temp))
 end
